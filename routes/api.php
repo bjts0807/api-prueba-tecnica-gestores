@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\NacController;
+use App\Http\Controllers\StrengtheningSupervisionManagerController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,14 @@ Route::prefix('nacs')->group(function () {
     Route::put('/update', [NacController::class, 'update']);
     Route::delete('/destroy', [NacController::class, 'destroy']);
     Route::get('/show/{id}', [NacController::class, 'show']);
+});
+
+Route::prefix('strengtheningSupervisionMan')->group(function () {
+    Route::get('/', [StrengtheningSupervisionManagerController::class, 'index']);
+    Route::post('/store', [StrengtheningSupervisionManagerController::class, 'store']);
+    Route::put('/update', [StrengtheningSupervisionManagerController::class, 'update']);
+    Route::delete('/destroy', [StrengtheningSupervisionManagerController::class, 'destroy']);
+    Route::get('/show/{id}', [StrengtheningSupervisionManagerController::class, 'show']);
 });
 
 
