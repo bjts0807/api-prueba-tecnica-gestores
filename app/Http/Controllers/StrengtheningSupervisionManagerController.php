@@ -115,9 +115,35 @@ class StrengtheningSupervisionManagerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        try {
+
+            DB::beginTransaction();
+
+            $supervision=StrengtheningSupervisionManagers::find($request->id);
+            $supervision->nac_id=$request->nac['id'];
+            $supervision->role_id=$request->rol['id'];
+            $supervision->revision_date=$request->revision_date;
+            $supervision->start_time=$request->start_time;
+            $supervision->final_time=$request->final_time;
+            if(!empty($request->evidence_participation_image)){
+                $supervision->evidence_participation_image=$request->evidence_participation_image;
+            }
+            if(!empty($request->development_activity_image)){
+                $supervision->development_activity_image=$request->development_activity_image;
+            }
+            $supervision->save();
+
+            DB::commit();
+
+            return response()->json($supervision);
+
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            Log::error($ex->getMessage().PHP_EOL.$ex->getTraceAsString());
+            return response()->json(['status' => 'fail', 'msg' => 'Ha ocurrido un error al procesar la solicitud'], 500);
+        }
     }
 
     /**
