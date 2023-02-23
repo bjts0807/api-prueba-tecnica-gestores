@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\StrengtheningSupervisionManagers;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,9 +14,30 @@ class StrengtheningSupervisionManagerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request, StrengtheningSupervisionManagers $model)
     {
-        //
+
+        $query = $model->query();
+
+        $query->when($request->has('s'), function($query) use($request){
+            $search = trim($request->s);
+            $query->whereHas('nac', function ($query) use ($search) {
+                $query->where('name',
+                    'like',
+                    "%{$search}%"
+                );
+            })->orWhereHas('rol', function ($query) use ($search) {
+                $query->where('name',
+                    'like',
+                    "%{$search}%"
+                );
+            });
+        })
+        ->with(['nac','rol']);
+
+        return $request->has('per_page')
+        ? $query->paginate($request->per_page)
+        : $query->get();
     }
 
     /**
@@ -73,7 +93,8 @@ class StrengtheningSupervisionManagerController extends Controller
      */
     public function show($id)
     {
-        //
+        $supervision=StrengtheningSupervisionManagers::where('id', $id)->with(['nac.roles','rol'])->first();
+        return response()->json($supervision);
     }
 
     /**
